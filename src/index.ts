@@ -19,16 +19,16 @@ app.set('trust proxy', 1);
 // Security
 app.use(helmet());
 
-const allowedOrigins = env.clientUrl
+const allowedOrigins = new Set(env.clientUrl
   .split(',')
   .map((o) => o.trim())
-  .filter(Boolean);
+  .filter(Boolean));
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, etc.)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.has(origin)) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -47,10 +47,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Logging
-if (!env.isProduction) {
-  app.use(morgan('dev'));
-} else {
+if (env.isProduction) {
   app.use(morgan('combined'));
+} else {
+  app.use(morgan('dev'));
 }
 
 // Routes
