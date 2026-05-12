@@ -13,6 +13,9 @@ validateEnv();
 
 const app = express();
 
+// Trust proxy for rate limiting behind reverse proxy (must be before rate limiter)
+app.set('trust proxy', 1);
+
 // Security
 app.use(helmet());
 
@@ -49,9 +52,6 @@ if (!env.isProduction) {
 } else {
   app.use(morgan('combined'));
 }
-
-// Trust proxy for rate limiting behind reverse proxy
-app.set('trust proxy', 1);
 
 // Routes
 app.use('/api', routes);
